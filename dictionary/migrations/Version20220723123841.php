@@ -22,7 +22,7 @@ final class Version20220723123841 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE SEQUENCE code_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE dictionary_item_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
-        $this->addSql('CREATE TABLE code (id INT NOT NULL, name VARCHAR(255) NOT NULL, global_id INT NOT NULL, razdel VARCHAR(255) NOT NULL, kod INT DEFAULT NULL, nomdescr VARCHAR(255) DEFAULT NULL, idx VARCHAR(255) NOT NULL, deleted_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE code (id INT NOT NULL, name TEXT NOT NULL, global_id BIGINT NOT NULL, razdel VARCHAR(255) NOT NULL, kod VARCHAR(255) DEFAULT NULL, nomdescr TEXT DEFAULT NULL, idx VARCHAR(255) NOT NULL, deleted_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('COMMENT ON COLUMN code.deleted_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('CREATE TABLE dictionary_item (id INT NOT NULL, title VARCHAR(255) DEFAULT NULL, deleted TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, pid INT DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE TABLE messenger_messages (id BIGSERIAL NOT NULL, body TEXT NOT NULL, headers TEXT NOT NULL, queue_name VARCHAR(190) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, available_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, delivered_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
