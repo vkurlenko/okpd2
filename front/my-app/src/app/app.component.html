@@ -1,0 +1,81 @@
+
+<div class="mb-4 flex justify-content-between">
+  <p-fileUpload mode="basic" name="myfile[]"
+                [customUpload]="true"
+                accept=".xml"
+                (uploadHandler)="onUpload($event)"
+                [auto]="true"
+                chooseLabel="Upload .XML"
+                chooseIcon="pi-upload"
+  ></p-fileUpload>
+  <p-button type="button" (onClick)="displayAddDialog = true" label="New code" icon="pi pi-plus"></p-button>
+</div>
+
+<p-tree [value]="nodes"
+        [filter]="true"
+        (onNodeExpand)="nodeExpand($event)"
+        [loading]="loading"
+        selectionMode="single"
+        [(selection)]="selectedFile"
+        [contextMenu]="cm"
+>
+  <ng-template let-node pTemplate="default">
+    <span>{{node.label}}</span>
+  </ng-template>
+</p-tree>
+
+<p-contextMenu #cm [model]="items"></p-contextMenu>
+
+<p-dialog header="Code" [(visible)]="displayAddDialog" [modal]="true">
+  <form [formGroup]="nodeForm" (submit)="onSave()">
+    <table>
+      <tr>
+        <td>ID</td>
+        <td><input type="hidden" pInputText class="form-control" name="id" formControlName="id" /></td>
+      </tr>
+      <tr>
+        <td>Name</td>
+        <td><input type="text" pInputText class="form-control" name="name" formControlName="name" /></td>
+      </tr>
+      <tr>
+        <td>global_id</td>
+        <td><input type="text" pInputText class="form-control" name="global_id" formControlName="global_id" /></td>
+      </tr>
+      <tr>
+        <td>idx</td>
+        <td><input type="text" pInputText class="form-control" name="idx" formControlName="idx" /></td>
+      </tr>
+      <tr>
+        <td>kod</td>
+        <td><input type="text" pInputText class="form-control" name="kod" formControlName="kod" /></td>
+      </tr>
+      <tr>
+        <td>nomdescr</td>
+        <td><input type="text" pInputText class="form-control" name="nomdescr" formControlName="nomdescr" /></td>
+      </tr>
+      <tr>
+        <td>razdel</td>
+        <td><input type="text" pInputText class="form-control" name="razdel" formControlName="razdel" /></td>
+      </tr>
+    </table>
+  </form>
+  <ng-template pTemplate="footer">
+    <p-button type="button" (onClick)="onSave()" label="Save"></p-button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog *ngIf="node" header="{{node.data.kod}} {{node.data.name}}" [(visible)]="display" [modal]="true">
+  <div>
+    <strong>global_id:</strong> {{node.data.global_id}}<br>
+<!--    id: {{node.data.id}}<br>-->
+    <strong>idx:</strong> {{node.data.idx}}<br>
+    <strong>kod:</strong> {{node.data.kod}}<br>
+<!--    level: {{node.data.level}}<br>-->
+    <strong>name:</strong> {{node.data.name}}<br>
+    <strong>nomdescr:</strong> {{node.data.nomdescr}}<br>
+    <strong>razdel:</strong> {{node.data.razdel}}
+  </div>
+</p-dialog>
+
+<p-confirmDialog [baseZIndex]="10000" rejectButtonStyleClass="p-button-text"></p-confirmDialog>
+<p-toast></p-toast>
