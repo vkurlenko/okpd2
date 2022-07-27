@@ -20,10 +20,8 @@ class CodeController extends AbstractController
     /**
      * @Route("/code", name="app_code")
      */
-    public function index(ManagerRegistry $doctrine): Response
+    public function index(): Response
     {
-//        $tree = $this->getTree();
-
         return $this->render('code/index.html.twig', [
             'controller_name' => 'CodeController',
         ]);
@@ -34,22 +32,10 @@ class CodeController extends AbstractController
      * @param Request $request
      * @param string $uploadDir
      * @param FileUploader $uploader
-     * @param LoggerInterface $logger
      * @return Response
      */
-    public function upload(Request $request, string $uploadDir,
-                           FileUploader $uploader, LoggerInterface $logger, ManagerRegistry $doctrine): Response
+    public function upload(Request $request, string $uploadDir, FileUploader $uploader, ManagerRegistry $doctrine): Response
     {
-//        $token = $request->get("token");
-//
-//        if (!$this->isCsrfTokenValid('upload', $token))
-//        {
-//            $logger->info("CSRF failure");
-//
-//            return new Response("Operation not allowed",  Response::HTTP_BAD_REQUEST,
-//                ['content-type' => 'text/plain']);
-//        }
-
         $file = $request->files->get('myfile');
 
         if (empty($file))
@@ -65,7 +51,7 @@ class CodeController extends AbstractController
             $xml = simplexml_load_file($uploadDir.'/'.$filename);
             $this->TruncateCodes($doctrine);
             $result = $this->createCode($doctrine, $xml);
-//            echo "Saved $result codes";
+
             return $this->response(['data' => $result]);
         }
 
@@ -110,7 +96,7 @@ class CodeController extends AbstractController
     /**
      * @Route("/add", name="add", methods={"POST"})
      */
-    public function add(Request $request, CodeRepository $codeRepository)
+    public function add(Request $request, CodeRepository $codeRepository): Response
     {
         $form = json_decode($request->getContent(), true);
 
@@ -130,11 +116,9 @@ class CodeController extends AbstractController
     /**
      * @Route("/update", name="update", methods={"POST"})
      */
-    public function update(Request $request, CodeRepository $codeRepository, ManagerRegistry $doctrine)
+    public function update(Request $request, CodeRepository $codeRepository, ManagerRegistry $doctrine): Response
     {
         $form = json_decode($request->getContent(), true);
-
-//        var_dump($form);
 
         $code = $codeRepository->find($form['id']);
         $code->setName($form['name']);
@@ -162,7 +146,7 @@ class CodeController extends AbstractController
     /**
      * @Route("/tree", name="tree", methods={"GET"})
      */
-    public function tree(CodeRepository $codeRepository)
+    public function tree(CodeRepository $codeRepository): Response
     {
         $tree = $codeRepository->getCodeClasses();
 
@@ -180,7 +164,7 @@ class CodeController extends AbstractController
         return $this->response(['data' => $tree]);
     }
 
-    public function getChildren($level, $code, CodeRepository $codeRepository)
+    public function getChildren($level, $code, CodeRepository $codeRepository): array
     {
         switch ($level) {
             case 1:
@@ -212,7 +196,7 @@ class CodeController extends AbstractController
     /**
      * @Route("/children", name="children")
      */
-    public function children(Request $request, CodeRepository $codeRepository)
+    public function children(Request $request, CodeRepository $codeRepository): Response
     {
         switch ($request->get('level')) {
             case 1:
@@ -244,7 +228,7 @@ class CodeController extends AbstractController
     /**
      * @Route("/delete", name="delete")
      */
-    public function delete(Request $request, CodeRepository $codeRepository)
+    public function delete(Request $request, CodeRepository $codeRepository): Response
     {
         $codeRepository->deleteNode($request->get('id'));
 
@@ -255,29 +239,16 @@ class CodeController extends AbstractController
      * Returns a JSON response
      *
      * @param array $data
-     * @param $status
+     * @param int $status
      * @param array $headers
      * @return JsonResponse
      */
-    public function response($data, $status = 200, $headers = []): JsonResponse
+    public function response(array $data, int $status = 200, array $headers = []): JsonResponse
     {
         return new JsonResponse($data, $status, $headers);
     }
 
-    protected function transformJsonBody(Request $request)
-    {
-        $data = json_decode($request->getContent(), true);
-
-        if ($data === null) {
-            return $request;
-        }
-
-        $request->request->replace($data);
-
-        return $request;
-    }
-
-    private function getCodeData($codeItem, $level)
+    private function getCodeData($codeItem, $level): array
     {
         return [
             "id" => $codeItem['id'],

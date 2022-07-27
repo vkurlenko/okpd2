@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Code;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Exception;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -39,24 +40,23 @@ class CodeRepository extends ServiceEntityRepository
         }
     }
 
-    public function getCodeClasses()
+    public function getCodeClasses(): array
     {
-        $conn = $this->getEntityManager()->getConnection();
+        $qb = $this->createQueryBuilder('c');
+        $qb->select('c')
+            ->where($qb->expr()->notLike('c.kod','\'%.%\''))
+            ->andWhere($qb->expr()->neq('c.kod','\'\''))
+            ->orderBy('CAST(c.kod AS INT)', 'ASC');
+        $query = $qb->getQuery();
 
-        $sql = "
-            SELECT * FROM code 
-            WHERE kod NOT LIKE '%.%' 
-              AND kod <> '' 
-            ORDER BY cast(kod as int)
-            ";
-        $stmt = $conn->prepare($sql);
-        $resultSet = $stmt->executeQuery();
-
-        return $resultSet->fetchAllAssociative();
+        return $query->getArrayResult();
     }
 
-
-    public function getChildren($pattern)
+    /**
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws Exception
+     */
+    public function getChildren($pattern): array
     {
         $conn = $this->getEntityManager()->getConnection();
 
@@ -67,34 +67,9 @@ class CodeRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
-    public function deleteNode($id)
+    public function deleteNode($id): void
     {
         $codeEntity = $this->getEntityManager()->find(Code::class, $id);
         $this->remove($codeEntity, true);
     }
-
-//    /**
-//     * @return Code[] Returns an array of Code objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('c.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Code
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

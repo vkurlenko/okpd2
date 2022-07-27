@@ -17,7 +17,6 @@ class FileUploader
     public function upload($uploadDir, $file, $filename)
     {
         try {
-
             $file->move($uploadDir, $filename);
         } catch (FileException $e){
 
