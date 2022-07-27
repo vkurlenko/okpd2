@@ -67,9 +67,12 @@ class CodeRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
-    public function deleteNode($id): void
+    public function truncateCodes()
     {
-        $codeEntity = $this->getEntityManager()->find(Code::class, $id);
-        $this->remove($codeEntity, true);
+        $entityManager = $this->getEntityManager();
+        $connection = $entityManager->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+
+        $connection->executeUpdate($platform->getTruncateTableSQL('code', true));
     }
 }
